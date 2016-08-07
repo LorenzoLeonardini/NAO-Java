@@ -41,4 +41,29 @@ public abstract class Expression
 	{
 		return chestColor;
 	}
+	
+	public static class DefaultExpression extends Expression
+	{
+		public DefaultExpression()
+		{
+			super("Default", 0xffffff, 0x0000ff, 0x0000ff, 0xffff00);
+		}
+	}
+	
+	public static class HappyExpression extends Expression
+	{
+		public HappyExpression()
+		{
+			super("Happy", 0x00ff00, 0x0000ff, 0x0000ff, 0x00ff00);
+		}
+	}
+	
+	public static class AngryExpression extends Expression
+	{
+		public AngryExpression()
+		{
+			super("Angry", 0xff0000, 0xff0000, 0xff0000, 0xff0000);
+		}
+	}
+
 }

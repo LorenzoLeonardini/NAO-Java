@@ -1,11 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lorenzoleonardini.nao.AngryExpression;
-import org.lorenzoleonardini.nao.DefaultExpression;
-import org.lorenzoleonardini.nao.HappyExpression;
+import org.lorenzoleonardini.nao.Expression.AngryExpression;
+import org.lorenzoleonardini.nao.Expression.DefaultExpression;
+import org.lorenzoleonardini.nao.Expression.HappyExpression;
 import org.lorenzoleonardini.nao.Motion;
 import org.lorenzoleonardini.nao.NAO;
+import org.lorenzoleonardini.nao.Posture;
+import org.lorenzoleonardini.nao.userInterface.Window;
 
 import com.aldebaran.qi.CallError;
 import com.aldebaran.qi.helper.EventCallback;
@@ -14,14 +16,21 @@ public class Main
 {
 	private NAO nao;
 	private Motion motion;
+	private Posture posture;
 	private boolean canMove = true;
+
+	long sonarLeft = 0;
+	long sonarRight = 0;
 
 	public Main()
 	{
-		motion = new Motion();
-
-		nao = new NAO("192.168.1.47");
+		nao = new NAO("192.168.1.24");
 		nao.changeLanguage("italian");
+
+		new Window(nao);
+
+		motion = new Motion();
+		posture = new Posture(nao);
 
 		final DefaultExpression defaultExp = new DefaultExpression();
 		final AngryExpression angryExp = new AngryExpression();
@@ -41,10 +50,47 @@ public class Main
 
 		nao.setVocabulary(vocab);
 
-		nao.setBreathing(false);
-		nao.changePosture(NAO.CROUCH);
+		posture.setBreathing(false);
+		posture.stand();
 
 		nao.trackFace();
+
+		new Thread()
+		{
+			@Override
+			public void run()
+			{
+				while (true)
+				{
+					// System.out.println((System.currentTimeMillis() <=
+					// sonarLeft + 500) && (System.currentTimeMillis() <=
+					// sonarRight + 500));
+					// try
+					// {
+					// System.out.println(nao.bodyTemperature.getTemperatureDiagnosis());
+					// }
+					// catch (CallError e)
+					// {
+					// // TODO Auto-generated catch block
+					// e.printStackTrace();
+					// }
+					// catch (InterruptedException e)
+					// {
+					// // TODO Auto-generated catch block
+					// e.printStackTrace();
+					// }
+				}
+			}
+		}.start();
+
+		nao.addEvent("PassiveDiagnosisErrorChanged", new EventCallback<Float>()
+		{
+			@Override
+			public void onEvent(Float f)
+			{
+				System.out.println(f);
+			}
+		});
 
 		nao.addEvent("FrontTactilTouched", new EventCallback<Float>()
 		{
@@ -54,15 +100,6 @@ public class Main
 				if (f > 0)
 				{
 					nao.setExpression(happyExp, .1f);
-					try
-					{
-						System.out.println(nao.diagnosis.getActiveDiagnosis());
-						System.out.println(nao.diagnosis.getPassiveDiagnosis());
-					}
-					catch (CallError | InterruptedException e)
-					{
-						e.printStackTrace();
-					}
 				}
 				else
 				{
@@ -85,22 +122,22 @@ public class Main
 					case "nao in piedi":
 						if (!canMove)
 							break;
-						nao.changePosture(NAO.STAND);
+						posture.stand();
 						break;
-					// case "ciao":
-					// case "buongiorno":
-					// if (!canMove)
-					// break;
-					// canMove = false;
-					// motion.saluta(nao);
-					// Thread.sleep(3000);
-					// canMove = true;
-					// break;
+//					case "ciao":
+//					case "buongiorno":
+//						if (!canMove)
+//							break;
+//						canMove = false;
+//						motion.saluta(nao);
+//						Thread.sleep(3000);
+//						canMove = true;
+//						break;
 					case "nao seduto":
 					case "nao siediti":
 						if (!canMove)
 							break;
-						nao.changePosture(NAO.CROUCH);
+						posture.crouch();
 						break;
 					case "blocca movimenti":
 						canMove = false;
@@ -111,7 +148,7 @@ public class Main
 					case "nao cammina":
 						if (!canMove)
 							break;
-						nao.changePosture(NAO.STAND);
+						posture.stand();
 						nao.move(0.25f, 0, 0);
 						break;
 					}
@@ -141,8 +178,35 @@ public class Main
 			}
 		});
 
+		nao.addEvent("SonarLeftNothingDetected", new EventCallback<Float>()
+		{
+			@Override
+			public void onEvent(Float l)
+			{
+				sonarLeft = System.currentTimeMillis();
+			}
+		});
+
+		nao.addEvent("SonarRightNothingDetected", new EventCallback<Float>()
+		{
+			@Override
+			public void onEvent(Float l)
+			{
+				sonarRight = System.currentTimeMillis();
+			}
+		});
+
+		try
+		{
+			nao.leds.fadeRGB("FeetLeds", 0x00ff00, .3f);
+		}
+		catch (CallError | InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+
 		nao.say(nao.getPowerLevel() + "%");
-		
+
 		nao.run();
 	}
 
