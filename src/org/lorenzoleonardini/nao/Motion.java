@@ -4,7 +4,14 @@ import com.aldebaran.qi.CallError;
 
 public class Motion
 {
-	public void saluta(final NAO nao)
+	private NAO nao;
+	
+	public Motion(NAO nao)
+	{
+		this.nao = nao;
+	}
+	
+	public void saluta()
 	{
 		new Thread()
 		{

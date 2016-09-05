@@ -10,6 +10,8 @@ public class Posture
 	public static String LYING_BELLY = "LyingBelly";
 	public static String SIT = "Sit";
 	public static String SIT_RELAX = "SitRelax";
+	public static String CROUCH = "Crouch";
+	public static String STAND = "Stand";
 	public static String STAND_INIT = "StandInit";
 	public static String STAND_ZERO = "StandZero";
 	

@@ -4,7 +4,6 @@ import java.util.List;
 import org.lorenzoleonardini.nao.Expression.AngryExpression;
 import org.lorenzoleonardini.nao.Expression.DefaultExpression;
 import org.lorenzoleonardini.nao.Expression.HappyExpression;
-import org.lorenzoleonardini.nao.Motion;
 import org.lorenzoleonardini.nao.NAO;
 import org.lorenzoleonardini.nao.Posture;
 import org.lorenzoleonardini.nao.userInterface.Window;
@@ -15,7 +14,6 @@ import com.aldebaran.qi.helper.EventCallback;
 public class Main
 {
 	private NAO nao;
-	private Motion motion;
 	private Posture posture;
 	private boolean canMove = true;
 
@@ -28,8 +26,9 @@ public class Main
 		nao.changeLanguage("italian");
 
 		new Window(nao);
+		
+//		if(true) return;
 
-		motion = new Motion();
 		posture = new Posture(nao);
 
 		final DefaultExpression defaultExp = new DefaultExpression();
@@ -51,7 +50,7 @@ public class Main
 		nao.setVocabulary(vocab);
 
 		posture.setBreathing(false);
-		posture.stand();
+		posture.crouch();
 
 		nao.trackFace();
 
@@ -169,7 +168,7 @@ public class Main
 				if (!b)
 				{
 					nao.setExpression(angryExp, 0);
-					nao.say("pòsami subito!");
+//					nao.say("pòsami subito!");
 				}
 				else
 				{
@@ -205,7 +204,7 @@ public class Main
 			e.printStackTrace();
 		}
 
-		nao.say(nao.getPowerLevel() + "%");
+		//nao.say(nao.getPowerLevel() + "%");
 
 		nao.run();
 	}

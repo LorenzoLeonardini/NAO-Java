@@ -38,9 +38,12 @@ public class NAO
 	private ALTextToSpeech tts;
 
 	private Expression exp;
+	
+	private Motion myMotion;
 
 	public NAO(String IP)
 	{
+		myMotion = new Motion(this);
 		robotURL = "tcp://" + IP + ":9559";
 		application = new Application(new String[0], robotURL);
 		application.start();
@@ -48,18 +51,27 @@ public class NAO
 		initializeServices();
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> unsubscribeFromAll()));
 	}
+	
+	public Motion getMotion()
+	{
+		return myMotion;
+	}
 
 	public void unsubscribeFromAll()
 	{
 		try
 		{
+			log("Disabling speech recognition");
 			speechRecognition.unsubscribe("WordRecognised");
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
+			error("Error while disabling speech recognition!");
 		}
 		try
 		{
+			log("Disabling all sonars");
 			sonar.unsubscribe("SonarLeftDetected");
 			sonar.unsubscribe("SonarRightDetected");
 			sonar.unsubscribe("SonarLeftNothingDetected");
@@ -67,6 +79,7 @@ public class NAO
 		}
 		catch (Exception e)
 		{
+			error("Error while disabling sonars!");
 		}
 		log("Stopping application");
 		stop();
@@ -237,5 +250,10 @@ public class NAO
 	private void log(String message)
 	{
 		System.out.println("NAO > " + message);
+	}
+	
+	private void error(String message)
+	{
+		System.err.println("NAO > " + message);
 	}
 }

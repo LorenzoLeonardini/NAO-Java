@@ -1,17 +1,17 @@
 package org.lorenzoleonardini.nao.userInterface;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.JColorChooser;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.colorchooser.AbstractColorChooserPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.lorenzoleonardini.nao.NAO;
-
-import com.aldebaran.qi.CallError;
 
 public class Window extends JFrame
 {
@@ -19,68 +19,73 @@ public class Window extends JFrame
 
 	private JPanel contentPane;
 
-	public Window(final NAO nao)
+	private NAO nao;
+	private LEDColors ledColors;
+	private Postures postures;
+
+	public Window(NAO nao)
 	{
+		this.nao = nao;
+		ledColors = new LEDColors(nao);
+		postures = new Postures(nao);
 		setSize(800, 600);
 		setTitle("NAO-Java | Lorenzo Leonardini");
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+		try
+		{
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+		catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e)
+		{
+			e.printStackTrace();
+		}
+		
 		contentPane = new JPanel();
 		contentPane.setLayout(null);
 		contentPane.setBackground(Color.white);
 		setContentPane(contentPane);
-
-		JColorChooser cc = new JColorChooser();
-		AbstractColorChooserPanel[] panels = cc.getChooserPanels();
-		for (AbstractColorChooserPanel accp : panels)
-		{
-			if (accp.getDisplayName().equals("HSV"))
-			{
-				accp.setBounds(0, 0, 300, 130);
-				accp.getColorSelectionModel().addChangeListener(new ChangeListener()
-				{
-					public void stateChanged(ChangeEvent e)
-					{
-						try
-						{
-							nao.leds.fadeRGB("FaceLeds", cc.getColor().getRGB(), 0f);
-						}
-						catch (CallError | InterruptedException e1)
-						{
-							e1.printStackTrace();
-						}
-					}
-				});
-				contentPane.add(accp);
-			}
-		}
 		
-		JColorChooser cc2 = new JColorChooser();
-		AbstractColorChooserPanel[] panels2 = cc2.getChooserPanels();
-		for (AbstractColorChooserPanel accp : panels2)
+		JButton leds = new JButton("Control Leds");
+		leds.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		leds.addActionListener(new ActionListener()
 		{
-			if (accp.getDisplayName().equals("HSV"))
+			@Override
+			public void actionPerformed(ActionEvent e)
 			{
-				accp.setBounds(490, 0, 300, 130);
-				accp.getColorSelectionModel().addChangeListener(new ChangeListener()
-				{
-					public void stateChanged(ChangeEvent e)
-					{
-						try
-						{
-							nao.leds.fadeRGB("FeetLeds", cc2.getColor().getRGB(), 0f);
-						}
-						catch (CallError | InterruptedException e1)
-						{
-							e1.printStackTrace();
-						}
-					}
-				});
-				contentPane.add(accp);
+				ledColors.setVisible(true);
 			}
-		}
-
+		});
+		leds.setBounds(0, 0, 150, 25);
+		contentPane.add(leds);
+		
+		JButton saluta = new JButton("Saluta");
+		saluta.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		saluta.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				nao.getMotion().saluta();
+			}
+		});
+		saluta.setBounds(400, 0, 150, 25);
+		contentPane.add(saluta);
+		
+		JButton posture = new JButton("Postures");
+		posture.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		posture.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				postures.setVisible(true);
+			}
+		});
+		posture.setBounds(200, 0, 150, 25);
+		contentPane.add(posture);
+		
 		setVisible(true);
 	}
 }
