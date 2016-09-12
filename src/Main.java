@@ -1,21 +1,15 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.lorenzoleonardini.nao.Expression.AngryExpression;
-import org.lorenzoleonardini.nao.Expression.DefaultExpression;
-import org.lorenzoleonardini.nao.Expression.HappyExpression;
 import org.lorenzoleonardini.nao.NAO;
-import org.lorenzoleonardini.nao.Posture;
+import org.lorenzoleonardini.nao.RecognitionEvent;
 import org.lorenzoleonardini.nao.userInterface.Window;
 
-import com.aldebaran.qi.CallError;
 import com.aldebaran.qi.helper.EventCallback;
 
 public class Main
 {
 	private NAO nao;
-	private Posture posture;
-	private boolean canMove = true;
 
 	long sonarLeft = 0;
 	long sonarRight = 0;
@@ -23,64 +17,27 @@ public class Main
 	public Main()
 	{
 		nao = new NAO("192.168.1.24");
-		nao.changeLanguage("italian");
-
+		
+		if(!nao.connected)
+		{
+			System.err.println("SYS > Unable to estabilish connection");
+			System.err.println("SYS > Starting program with null nao (May be full of errors)");
+			new Window(null);
+			return;
+		}
+		
 		new Window(nao);
 		
-//		if(true) return;
-
-		posture = new Posture(nao);
-
-		final DefaultExpression defaultExp = new DefaultExpression();
-		final AngryExpression angryExp = new AngryExpression();
-		final HappyExpression happyExp = new HappyExpression();
-
-		nao.setExpression(defaultExp, 0);
-
-		List<String> vocab = new ArrayList<String>();
-		vocab.add("nao seduto");
-		vocab.add("nao siediti");
-		vocab.add("nao in piedi");
-		vocab.add("nao cammina");
-		vocab.add("ciao");
-		vocab.add("buongiorno");
-		vocab.add("blocca movimenti");
-		vocab.add("abilita movimenti");
-
-		nao.setVocabulary(vocab);
-
-		posture.setBreathing(false);
-		posture.crouch();
+		nao.changeLanguage("italian");
+		
+		nao.setExpression(NAO.defaultExp, 0);
+		
+		addSpeechRecognition();
+		
+		nao.posture.setBreathing(false);
+		nao.posture.crouch();
 
 		nao.trackFace();
-
-		new Thread()
-		{
-			@Override
-			public void run()
-			{
-				while (true)
-				{
-					// System.out.println((System.currentTimeMillis() <=
-					// sonarLeft + 500) && (System.currentTimeMillis() <=
-					// sonarRight + 500));
-					// try
-					// {
-					// System.out.println(nao.bodyTemperature.getTemperatureDiagnosis());
-					// }
-					// catch (CallError e)
-					// {
-					// // TODO Auto-generated catch block
-					// e.printStackTrace();
-					// }
-					// catch (InterruptedException e)
-					// {
-					// // TODO Auto-generated catch block
-					// e.printStackTrace();
-					// }
-				}
-			}
-		}.start();
 
 		nao.addEvent("PassiveDiagnosisErrorChanged", new EventCallback<Float>()
 		{
@@ -91,6 +48,7 @@ public class Main
 			}
 		});
 
+		//TODO: Wait a few seconds before changing expression (also to prevent glitches)
 		nao.addEvent("FrontTactilTouched", new EventCallback<Float>()
 		{
 			@Override
@@ -98,66 +56,13 @@ public class Main
 			{
 				if (f > 0)
 				{
-					nao.setExpression(happyExp, .1f);
+					nao.setExpression(NAO.happyExp, .1f);
 				}
 				else
 				{
-					nao.setExpression(defaultExp, .1f);
+					nao.setExpression(NAO.defaultExp, .1f);
 				}
 			}
-		});
-
-		nao.addEvent("WordRecognized", new EventCallback<ArrayList<String>>()
-		{
-			@Override
-			public void onEvent(ArrayList<String> arr)
-			{
-				try
-				{
-					String word = arr.get(0).replace("<...>", "").trim();
-					System.out.println(word);
-					switch (word)
-					{
-					case "nao in piedi":
-						if (!canMove)
-							break;
-						posture.stand();
-						break;
-//					case "ciao":
-//					case "buongiorno":
-//						if (!canMove)
-//							break;
-//						canMove = false;
-//						motion.saluta(nao);
-//						Thread.sleep(3000);
-//						canMove = true;
-//						break;
-					case "nao seduto":
-					case "nao siediti":
-						if (!canMove)
-							break;
-						posture.crouch();
-						break;
-					case "blocca movimenti":
-						canMove = false;
-						break;
-					case "abilita movimenti":
-						canMove = true;
-						break;
-					case "nao cammina":
-						if (!canMove)
-							break;
-						posture.stand();
-						nao.move(0.25f, 0, 0);
-						break;
-					}
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-
 		});
 
 		nao.addEvent("footContactChanged", new EventCallback<Boolean>()
@@ -167,48 +72,93 @@ public class Main
 			{
 				if (!b)
 				{
-					nao.setExpression(angryExp, 0);
+					nao.setExpression(NAO.angryExp, 0);
 //					nao.say("pòsami subito!");
 				}
 				else
 				{
-					nao.setExpression(defaultExp, 1);
+					nao.setExpression(NAO.defaultExp, 1);
 				}
 			}
 		});
 
-		nao.addEvent("SonarLeftNothingDetected", new EventCallback<Float>()
-		{
-			@Override
-			public void onEvent(Float l)
-			{
-				sonarLeft = System.currentTimeMillis();
-			}
-		});
-
-		nao.addEvent("SonarRightNothingDetected", new EventCallback<Float>()
-		{
-			@Override
-			public void onEvent(Float l)
-			{
-				sonarRight = System.currentTimeMillis();
-			}
-		});
-
-		try
-		{
-			nao.leds.fadeRGB("FeetLeds", 0x00ff00, .3f);
-		}
-		catch (CallError | InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-
-		//nao.say(nao.getPowerLevel() + "%");
-
 		nao.run();
 	}
+	
+	private void addSpeechRecognition()
+	{
+		Map<String[], RecognitionEvent> vocab = new HashMap<String[], RecognitionEvent>();
+		vocab.put(new String[] { "nao seduto", "nao siediti" } , new RecognitionEvent()
+		{
+			@Override
+			public void onWordRecognized(NAO nao)
+			{
+				if (!nao.canMove)
+					return;
+				nao.posture.crouch();
+			}
+		});
+		vocab.put(new String[] { "nao in piedi" }, new RecognitionEvent()
+		{
+			@Override
+			public void onWordRecognized(NAO nao)
+			{
+				if(!nao.canMove)
+					return;
+				nao.posture.stand();
+			}
+		});
+		vocab.put(new String[] { "nao cammina" }, new RecognitionEvent()
+		{
+			@Override
+			public void onWordRecognized(NAO nao)
+			{
+				if(!nao.canMove)
+					return;
+				nao.posture.stand();
+				nao.move(0.25f, 0, 0);
+			}
+		});
+		vocab.put(new String[] { "ciao", "buongiorno" }, new RecognitionEvent()
+		{
+			@Override
+			public void onWordRecognized(NAO nao)
+			{
+				if(!nao.canMove)
+					return;
+				nao.canMove = false;
+				nao.getMotion().saluta();
+				try
+				{
+					Thread.sleep(3000);
+				}
+				catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+				nao.canMove = true;
+			}
+		});
+		vocab.put(new String[] { "blocca movimenti" }, new RecognitionEvent()
+		{
+			@Override
+			public void onWordRecognized(NAO nao)
+			{
+				nao.canMove = false;
+			}
+		});
+		vocab.put(new String[] { "abilita movimenti" }, new RecognitionEvent()
+		{
+			@Override
+			public void onWordRecognized(NAO nao)
+			{
+				nao.canMove = true;
+			}
+		});
 
+		nao.setVocabulary(vocab);
+	}
+	
 	public static void main(String[] args)
 	{
 		new Main();

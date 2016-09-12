@@ -19,16 +19,15 @@ public class Window extends JFrame
 
 	private JPanel contentPane;
 
-	private NAO nao;
 	private LEDColors ledColors;
-	private Postures postures;
+	private PosturesGUI posturesGui;
 
 	public Window(NAO nao)
 	{
-		this.nao = nao;
 		ledColors = new LEDColors(nao);
-		postures = new Postures(nao);
-		setSize(800, 600);
+		posturesGui = new PosturesGUI(nao);
+		setSize(155, 103);
+		setResizable(false);
 		setTitle("NAO-Java | Lorenzo Leonardini");
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -60,6 +59,19 @@ public class Window extends JFrame
 		leds.setBounds(0, 0, 150, 25);
 		contentPane.add(leds);
 		
+		JButton posture = new JButton("Postures");
+		posture.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		posture.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				posturesGui.setVisible(true);
+			}
+		});
+		posture.setBounds(0, 25, 150, 25);
+		contentPane.add(posture);
+		
 		JButton saluta = new JButton("Saluta");
 		saluta.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		saluta.addActionListener(new ActionListener()
@@ -70,21 +82,8 @@ public class Window extends JFrame
 				nao.getMotion().saluta();
 			}
 		});
-		saluta.setBounds(400, 0, 150, 25);
+		saluta.setBounds(0, 50, 150, 25);
 		contentPane.add(saluta);
-		
-		JButton posture = new JButton("Postures");
-		posture.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		posture.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				postures.setVisible(true);
-			}
-		});
-		posture.setBounds(200, 0, 150, 25);
-		contentPane.add(posture);
 		
 		setVisible(true);
 	}

@@ -1,8 +1,6 @@
 package org.lorenzoleonardini.nao.userInterface;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
@@ -42,7 +40,7 @@ public class LEDColors extends JFrame
 		{
 			e.printStackTrace();
 		}
-
+		
 		contentPane = new JPanel();
 		contentPane.setLayout(null);
 		contentPane.setBackground(Color.white);

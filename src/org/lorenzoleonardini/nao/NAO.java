@@ -1,8 +1,13 @@
 package org.lorenzoleonardini.nao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.lorenzoleonardini.nao.Expression.AngryExpression;
+import org.lorenzoleonardini.nao.Expression.DefaultExpression;
+import org.lorenzoleonardini.nao.Expression.HappyExpression;
 
 import com.aldebaran.qi.Application;
 import com.aldebaran.qi.CallError;
@@ -21,6 +26,7 @@ import com.aldebaran.qi.helper.proxies.ALTracker;
 public class NAO
 {
 	private String robotURL;
+	public boolean connected = true;
 	protected Application application;
 	private ALMemory memory;
 
@@ -32,26 +38,38 @@ public class NAO
 	public ALLeds leds;
 	public ALDiagnosis diagnosis;
 	private ALSonar sonar;
-
-	private Map<String, Long> eventIDS = new HashMap<String, Long>();
-
 	private ALTextToSpeech tts;
 
+	public boolean canMove = true;
+	private Map<String, Long> eventIDS = new HashMap<String, Long>();
 	private Expression exp;
-	
+	public Posture posture;
 	private Motion myMotion;
+
+	public static DefaultExpression defaultExp = new DefaultExpression();
+	public static AngryExpression angryExp = new AngryExpression();
+	public static HappyExpression happyExp = new HappyExpression();
 
 	public NAO(String IP)
 	{
-		myMotion = new Motion(this);
 		robotURL = "tcp://" + IP + ":9559";
 		application = new Application(new String[0], robotURL);
-		application.start();
+		try
+		{
+			application.start();
+		}
+		catch (Exception e)
+		{
+			connected = false;
+			return;
+		}
+		myMotion = new Motion(this);
+		posture = new Posture(this);
 		log("Successfully connected to the robot!");
 		initializeServices();
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> unsubscribeFromAll()));
 	}
-	
+
 	public Motion getMotion()
 	{
 		return myMotion;
@@ -197,7 +215,46 @@ public class NAO
 		}
 	}
 
-	public void setVocabulary(List<String> vocab)
+	public void setVocabulary(Map<String[], RecognitionEvent> map)
+	{
+		NAO nao = this;
+		List<String> strings = new ArrayList<String>();
+
+		for (String[] s : map.keySet())
+			for (String s1 : s)
+				strings.add(s1);
+
+		setVocabulary(strings);
+		addEvent("WordRecognized", new EventCallback<ArrayList<String>>()
+		{
+			@Override
+			public void onEvent(ArrayList<String> arr)
+			{
+				try
+				{
+					String word = arr.get(0).replace("<...>", "").trim();
+					System.out.println(word);
+					for (String[] s : map.keySet())
+					{
+						for (String s1 : s)
+						{
+							if (word.equalsIgnoreCase(s1))
+							{
+								map.get(s).onWordRecognized(nao);
+								break;
+							}
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	private void setVocabulary(List<String> vocab)
 	{
 		try
 		{
@@ -251,7 +308,7 @@ public class NAO
 	{
 		System.out.println("NAO > " + message);
 	}
-	
+
 	private void error(String message)
 	{
 		System.err.println("NAO > " + message);
