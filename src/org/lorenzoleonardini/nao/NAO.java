@@ -15,6 +15,7 @@ import com.aldebaran.qi.helper.EventCallback;
 import com.aldebaran.qi.helper.proxies.ALBattery;
 import com.aldebaran.qi.helper.proxies.ALBodyTemperature;
 import com.aldebaran.qi.helper.proxies.ALDiagnosis;
+import com.aldebaran.qi.helper.proxies.ALFaceDetection;
 import com.aldebaran.qi.helper.proxies.ALLeds;
 import com.aldebaran.qi.helper.proxies.ALMemory;
 import com.aldebaran.qi.helper.proxies.ALMotion;
@@ -39,6 +40,7 @@ public class NAO
 	public ALDiagnosis diagnosis;
 	private ALSonar sonar;
 	private ALTextToSpeech tts;
+	private ALFaceDetection faceDetection;
 
 	public boolean canMove = true;
 	private Map<String, Long> eventIDS = new HashMap<String, Long>();
@@ -122,6 +124,7 @@ public class NAO
 			sonar.subscribe("SonarRightDetected");
 			sonar.subscribe("SonarLeftNothingDetected");
 			sonar.subscribe("SonarRightNothingDetected");
+			faceDetection = new ALFaceDetection(application.session());
 		}
 		catch (Exception e)
 		{
