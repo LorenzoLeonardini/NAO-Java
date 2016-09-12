@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,30 +15,56 @@ public class Main
 	long sonarLeft = 0;
 	long sonarRight = 0;
 
+	String lastRec = "";
+
 	public Main()
 	{
 		nao = new NAO("192.168.1.24");
-		
-		if(!nao.connected)
+
+		if (!nao.connected)
 		{
 			System.err.println("SYS > Unable to estabilish connection");
 			System.err.println("SYS > Starting program with null nao (May be full of errors)");
 			new Window(null);
 			return;
 		}
-		
+
 		new Window(nao);
-		
+
 		nao.changeLanguage("italian");
-		
+
 		nao.setExpression(NAO.defaultExp, 0);
-		
+
 		addSpeechRecognition();
-		
+
 		nao.posture.setBreathing(false);
 		nao.posture.crouch();
 
 		nao.trackFace();
+
+		nao.addEvent("FaceDetected", new EventCallback<ArrayList<ArrayList<ArrayList<ArrayList<String>>>>>()
+		{
+			@Override
+			public void onEvent(ArrayList<ArrayList<ArrayList<ArrayList<String>>>> s)
+			{
+				String name = null;
+				try
+				{
+					name = (s.get(1).get(1).get(1).get(0)).trim();
+					nao.log("Recognized " + name);
+				}
+				catch (Exception e)
+				{
+
+				}
+				if (name != null)
+				{
+					if (!name.equals(lastRec))
+						nao.say("Ciao " + name + "!");
+					lastRec = name;
+				}
+			}
+		});
 
 		nao.addEvent("PassiveDiagnosisErrorChanged", new EventCallback<Float>()
 		{
@@ -48,7 +75,8 @@ public class Main
 			}
 		});
 
-		//TODO: Wait a few seconds before changing expression (also to prevent glitches)
+		// TODO: Wait a few seconds before changing expression (also to prevent
+		// glitches)
 		nao.addEvent("FrontTactilTouched", new EventCallback<Float>()
 		{
 			@Override
@@ -73,7 +101,7 @@ public class Main
 				if (!b)
 				{
 					nao.setExpression(NAO.angryExp, 0);
-//					nao.say("pòsami subito!");
+					// nao.say("pòsami subito!");
 				}
 				else
 				{
@@ -84,11 +112,12 @@ public class Main
 
 		nao.run();
 	}
-	
+
 	private void addSpeechRecognition()
 	{
 		Map<String[], RecognitionEvent> vocab = new HashMap<String[], RecognitionEvent>();
-		vocab.put(new String[] { "nao seduto", "nao siediti" } , new RecognitionEvent()
+		vocab.put(new String[]
+		{ "nao seduto", "nao siediti" }, new RecognitionEvent()
 		{
 			@Override
 			public void onWordRecognized(NAO nao)
@@ -98,33 +127,36 @@ public class Main
 				nao.posture.crouch();
 			}
 		});
-		vocab.put(new String[] { "nao in piedi" }, new RecognitionEvent()
+		vocab.put(new String[]
+		{ "nao in piedi" }, new RecognitionEvent()
 		{
 			@Override
 			public void onWordRecognized(NAO nao)
 			{
-				if(!nao.canMove)
+				if (!nao.canMove)
 					return;
 				nao.posture.stand();
 			}
 		});
-		vocab.put(new String[] { "nao cammina" }, new RecognitionEvent()
+		vocab.put(new String[]
+		{ "nao cammina" }, new RecognitionEvent()
 		{
 			@Override
 			public void onWordRecognized(NAO nao)
 			{
-				if(!nao.canMove)
+				if (!nao.canMove)
 					return;
 				nao.posture.stand();
 				nao.move(0.25f, 0, 0);
 			}
 		});
-		vocab.put(new String[] { "ciao", "buongiorno" }, new RecognitionEvent()
+		vocab.put(new String[]
+		{ "ciao", "buongiorno" }, new RecognitionEvent()
 		{
 			@Override
 			public void onWordRecognized(NAO nao)
 			{
-				if(!nao.canMove)
+				if (true)
 					return;
 				nao.canMove = false;
 				nao.getMotion().saluta();
@@ -139,7 +171,8 @@ public class Main
 				nao.canMove = true;
 			}
 		});
-		vocab.put(new String[] { "blocca movimenti" }, new RecognitionEvent()
+		vocab.put(new String[]
+		{ "blocca movimenti" }, new RecognitionEvent()
 		{
 			@Override
 			public void onWordRecognized(NAO nao)
@@ -147,7 +180,8 @@ public class Main
 				nao.canMove = false;
 			}
 		});
-		vocab.put(new String[] { "abilita movimenti" }, new RecognitionEvent()
+		vocab.put(new String[]
+		{ "abilita movimenti" }, new RecognitionEvent()
 		{
 			@Override
 			public void onWordRecognized(NAO nao)
@@ -158,9 +192,14 @@ public class Main
 
 		nao.setVocabulary(vocab);
 	}
-	
+
 	public static void main(String[] args)
 	{
 		new Main();
+	}
+
+	public String get(String s)
+	{
+		return s;
 	}
 }

@@ -79,7 +79,11 @@ public class Window extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				nao.getMotion().saluta();
+//				nao.getMotion().saluta();
+				if(!nao.canMove)
+					return;
+				nao.posture.stand();
+				nao.move(0.25f, 0, 0);
 			}
 		});
 		saluta.setBounds(0, 50, 150, 25);

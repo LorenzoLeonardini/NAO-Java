@@ -233,7 +233,6 @@ public class NAO
 				try
 				{
 					String word = arr.get(0).replace("<...>", "").trim();
-					System.out.println(word);
 					for (String[] s : map.keySet())
 					{
 						for (String s1 : s)
@@ -304,7 +303,7 @@ public class NAO
 		application.stop();
 	}
 
-	private void log(String message)
+	public void log(String message)
 	{
 		System.out.println("NAO > " + message);
 	}
