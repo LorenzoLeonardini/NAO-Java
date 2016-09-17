@@ -1,9 +1,9 @@
+package org.lorenzoleonardini.nao;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.lorenzoleonardini.nao.NAO;
-import org.lorenzoleonardini.nao.RecognitionEvent;
+import org.lorenzoleonardini.nao.userInterface.IP;
 import org.lorenzoleonardini.nao.userInterface.Window;
 
 import com.aldebaran.qi.helper.EventCallback;
@@ -17,9 +17,9 @@ public class Main
 
 	String lastRec = "";
 
-	public Main()
+	public Main(String ip)
 	{
-		nao = new NAO("192.168.1.24");
+		nao = new NAO(ip);
 
 		if (!nao.connected)
 		{
@@ -195,7 +195,7 @@ public class Main
 
 	public static void main(String[] args)
 	{
-		new Main();
+		new IP();
 	}
 
 	public String get(String s)
