@@ -1,0 +1,45 @@
+# BORDERS
+windowBorder:;
+pickerBorder:42;46;68;255;
+# COLORS
+windowBG:42;46;68;200;
+panelBG:42;46;68;255;
+barBG:37;41;63;255;
+minimizeBG:20;24;46;255;
+barTitle:255;255;255;255;
+foreground:255;255;255;220;
+foregroundSelected:255;255;255;255;
+foregroundHover:255;255;255;240;
+foregroundText:255;255;255;220;
+foregroundSelectedText:255;255;255;255;
+foregroundHoverText:255;255;255;240;
+combo:0;0;0;255;
+comboSelected:20;24;46;255;
+bg:;
+bgSelected:42;46;68;120;
+bgHover:42;46;68;70;
+pickerBG:52;56;78;255;
+fieldBG:227;228;231;255;
+disabledBG:0;0;0;140;
+# IMAGES
+exitIcon:xDark.png;
+exitHoverIcon:xDark.png;
+minimizeIcon:_Dark.png;
+loading:loadingDark.gif;
+loading2:loadingDark2.gif;
+pickerReduce:reduceDark.png;
+pickerExtDx:extDxDark.png;
+pickerExtSn:extSnDark.png;
+switchBG:switchDark.png;
+switchBall:switchBallDark.png;
+btn:btnDark.png;
+stand:standDark.png;
+standInit:standInitDark.png;
+standZero:standZeroDark.png;
+crouch:crouchDark.png;
+sit:sitDark.png;
+sitRelax:sitRelaxDark.png;
+lyingBelly:lyingBellyDark.png;
+lyingBack:lyingBackDark.png;
+hello:bohDark.png;
+naoBig:BigNAO.png;
