@@ -12,16 +12,4 @@ public class Const
 	public static Font FONT_17 = new Font("Raleway", Font.PLAIN, 17);
 	public static Font FONT_BOLD_17 = new Font("Raleway", Font.BOLD, 17);
 	/* ---- END CONSTANTS  ---- */
-	
-	private static Window window;
-	
-	public static void init(Window window)
-	{
-		Const.window = window;
-	}
-	
-	public static void updateUI()
-	{
-		window.updateUI();
-	}
 }

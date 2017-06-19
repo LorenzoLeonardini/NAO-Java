@@ -1,49 +1,44 @@
 package org.lorenzoleonardini.naojava.resources;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-
 public class Language
 {
-	private String name;
+	// MENU
+	public String home;
+	public String postures;
+	public String leds;
+	public String settings;
 	
-	private Map<String, String> strings = new HashMap<String, String>();
-		
-	public Language(String file)
-	{
-		name = file.substring(0, 2);
-		try
-		{
-			BufferedReader reader = new BufferedReader(new InputStreamReader(Language.class.getResource(file).openStream()));
-			
-			String line;
-			while((line = reader.readLine()) != null)
-			{
-				String parts[] = line.split(":");
-				strings.put(parts[0].toLowerCase(), parts[1]);
-			}
-			
-			reader.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
+	// HOME PANEL
+	public String connect;
+	public String ip;
+	public String port;
 	
-	public String getString(String id)
-	{
-		String ret = strings.get(id.toLowerCase());
-		if(ret == null)
-			return id;
-		return ret;
-	}
+	// LEDS PANEL
+	public String brain;
+	public String eyes;
+	public String rEye;
+	public String lEye;
+	public String ears;
+	public String chest;
+	public String feet;
+	public String rFoot;
+	public String lFoot;
 	
-	public String toString()
-	{
-		return name;
-	}
+	// SETTINGS PANEL
+	public String language;
+	public String theme;
+	public String darkTheme;
+	public String whiteTheme;
+	public String about;
+	public String developed;
+	public String source;
+	
+	public String connectionRequired;
+	
+	// ERRORS
+	public String cantConnect;
+	public String notConnected;
+	public String noAddr;
+	public String noPort;
+	public String cantReach;
 }
