@@ -1,12 +1,16 @@
 package org.lorenzoleonardini.naojava;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Random;
 
 import org.lorenzoleonardini.naojava.ui.Window;
 
@@ -33,9 +37,9 @@ public class NAO
 	private ALAutonomousMoves autoMove;
 	private ALMotion motion;
 
-	public String cameraID;
+	private String cameraID;
 
-	public ALVideoDevice camera;
+	private ALVideoDevice camera;
 
 	private String ip;
 
@@ -44,6 +48,10 @@ public class NAO
 	private Channel channel;
 
 	private List<List<String>> config;
+	
+	private boolean emulated;
+
+	private String color;
 
 	@SuppressWarnings("unchecked")
 	public NAO(Window window, String ip) throws NAOConnectionException
@@ -53,6 +61,18 @@ public class NAO
 		if(ip.split(":")[1].length() == 0)
 			throw new NAOConnectionException(window.lang.getString("noPort"));
 		this.ip = ip;
+		
+		Random r = new Random();
+		color = r.nextInt(100) < 50 ? "orange" : "blue";
+		
+		// Emulated NAO, for testing :3
+		if(ip.split(":")[0].equalsIgnoreCase("localhost") || ip.split(":")[0].equalsIgnoreCase("127.0.0.1"))
+		{
+			name = "Localhost";
+			emulated = true;
+			return;
+		}
+		
 		// Checking if NAO is online
 		try
 		{
@@ -161,6 +181,8 @@ public class NAO
 
 	public void changeLedColor(String colorID, Color color)
 	{
+		if(emulated)
+			return;
 		Thread t = new Thread(() -> {
 			try
 			{
@@ -176,6 +198,8 @@ public class NAO
 
 	public void posture(String pst, float speed)
 	{
+		if(emulated)
+			return;
 		Thread t = new Thread(() -> {
 			try
 			{
@@ -191,9 +215,11 @@ public class NAO
 	
 	public void motionSetPosition(String chainName, int space, List<Float> position, int axisMask, List<Float> time)
 	{
+		if(emulated)
+			return;
 		try
 		{
-			motion.setPosition(chainName, space, position, .5f, axisMask);
+			motion.positionInterpolations(chainName, space, position, axisMask, 1);
 		}
 		catch (CallError | InterruptedException e)
 		{
@@ -203,6 +229,8 @@ public class NAO
 	
 	public void openHand(String hand)
 	{
+		if(emulated)
+			return;
 		try
 		{
 			motion.openHand(hand);
@@ -215,6 +243,8 @@ public class NAO
 	
 	public void closeHand(String hand)
 	{
+		if(emulated)
+			return;
 		try
 		{
 			motion.closeHand(hand);
@@ -224,7 +254,69 @@ public class NAO
 			e.printStackTrace();
 		}
 	}
+	
+	public BufferedImage getCameraImage()
+	{
+		int HEIGHT = 480, WIDTH = 640;
+		BufferedImage bufferedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		int pixels[] = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
+		
+		if(emulated)
+		{
+			for(int i = 0; i < pixels.length; i++)
+				pixels[i] = 0x00000000;
+			return bufferedImage;
+		}
+		
+		List<Object> image = getImageRemote();
+		ByteBuffer buffer = (ByteBuffer) image.get(6);
+		byte[] rawData = buffer.array();
 
+
+		int[] intArray = new int[HEIGHT * WIDTH];
+		for (int i = 0; i < HEIGHT * WIDTH; i++)
+		{
+			// ((255 & 0xFF) << 24) | // alpha
+			intArray[i] = ((rawData[(i * 3 + 2)] & 0xFF) << 16) | // red
+			((rawData[i * 3 + 1] & 0xFF) << 8) | // green
+			((rawData[i * 3] & 0xFF)); // blue
+		}
+
+
+		for (int i = 0; i < pixels.length; i++)
+			pixels[i] = intArray[i];
+
+		releaseImage();
+		
+		return bufferedImage;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Object> getImageRemote()
+	{
+		try
+		{
+			return (List<Object>) camera.getImageRemote(cameraID);
+		}
+		catch (CallError | InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public void releaseImage()
+	{
+		try
+		{
+			camera.releaseImage(cameraID);
+		}
+		catch (CallError | InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public String getName()
 	{
 		return name;
@@ -248,5 +340,10 @@ public class NAO
 	public String getBodyVersion()
 	{
 		return config.get(1).get(2);
+	}
+	
+	public String getColor()
+	{
+		return color;
 	}
 }

@@ -26,7 +26,7 @@ public class Resources
 
 	private static Map<String, ImageIcon> icons = new HashMap<String, ImageIcon>();
 
-	protected static ImageIcon getIcon(String id)
+	public static ImageIcon getIcon(String id)
 	{
 		if (!icons.containsKey(id))
 		{

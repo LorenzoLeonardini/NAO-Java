@@ -25,7 +25,7 @@ public class Menu extends JPanel
 	private MenuElement leds;
 	private MenuElement settings;
 	
-	private PagePanel homePanel;
+	private HomePanel homePanel;
 	private PagePanel posturesPanel;
 	private PagePanel ledsPanel;
 	private PagePanel settingsPanel;
@@ -117,5 +117,10 @@ public class Menu extends JPanel
 		
 		for(PagePanel panel : extPanels)
 			panel.superUpdate(connected);
+	}
+	
+	public void homePanelLoading(boolean loading)
+	{
+		homePanel.loading(loading);
 	}
 }

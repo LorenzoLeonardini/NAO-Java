@@ -3,6 +3,8 @@ postures:POSTURES
 leds:LEDS
 settings:SETTINGS
 connect:CONNECT
+disconnect:DISCONNECT
+connectedAt:Connected at
 ip:IP
 port:PORT
 brain:Brain

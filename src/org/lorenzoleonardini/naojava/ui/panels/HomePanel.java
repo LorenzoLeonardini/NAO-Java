@@ -30,9 +30,10 @@ public class HomePanel extends PagePanel
 	private JLabel connect;
 	private JLabel background = new JLabel();
 	private JLabel error;
+	private JLabel loading;
 
 	private SavedNAO saved;
-	
+
 	private boolean connecting = false;
 
 	public HomePanel(Window window)
@@ -128,19 +129,27 @@ public class HomePanel extends PagePanel
 		background.setBackground(window.theme.getColor("pickerBG"));
 		background.setBounds(200, 207, 350, 200);
 		add(background);
+
+		loading = new JLabel(window.theme.getIcon("loading"));
+		loading.setBounds(0, 0, 750, 610);
+		loading.setVerticalAlignment(JLabel.CENTER);
+		loading.setHorizontalAlignment(JLabel.CENTER);
+		loading.setVisible(false);
+		add(loading);
 	}
 
 	private void estabilishConnection()
 	{
-		if(connecting)
+		if (connecting)
 			return;
 		connecting = true;
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		loading(true);
 		error.setVisible(false);
 		new Thread(() -> {
 			try
 			{
-				window.nao = new NAO(window, IP.getText() + ":" + PORT.getText());
+				window.setNAO(new NAO(window, IP.getText() + ":" + PORT.getText()));
 				if (window.nao == null)
 				{
 					throw new NAOConnectionException(window.lang.getString("cantConnect"));
@@ -148,7 +157,7 @@ public class HomePanel extends PagePanel
 				window.robots.addRobot(window.nao);
 				window.update(true);
 			}
-			catch (NAOConnectionException e)
+			catch (Exception e)
 			{
 				error.setText(e.getMessage());
 				error.setVisible(true);
@@ -156,6 +165,7 @@ public class HomePanel extends PagePanel
 			}
 			connecting = false;
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			loading(false);
 		}).start();
 	}
 
@@ -187,6 +197,8 @@ public class HomePanel extends PagePanel
 
 		background.setBorder(window.theme.getBorder("pickerBorder"));
 		background.setBackground(window.theme.getColor("pickerBG"));
+
+		loading.setIcon(window.theme.getIcon("loading"));
 	}
 
 	@Override
@@ -215,6 +227,19 @@ public class HomePanel extends PagePanel
 			remove(saved);
 			saved = null;
 		}
+	}
+
+	public void loading(boolean loading)
+	{
+		title.setVisible(!loading && saved == null);
+		IP.setVisible(!loading && saved == null);
+		PORT.setVisible(!loading && saved == null);
+		ip.setVisible(!loading && saved == null);
+		port.setVisible(!loading && saved == null);
+		connect.setVisible(!loading && saved == null);
+		background.setVisible(!loading && saved == null);
+		error.setVisible(!loading && saved == null);
+		this.loading.setVisible(loading);
 	}
 
 	@Override

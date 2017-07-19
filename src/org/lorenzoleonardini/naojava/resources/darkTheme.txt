@@ -42,4 +42,4 @@ sitRelax:sitRelaxDark.png;
 lyingBelly:lyingBellyDark.png;
 lyingBack:lyingBackDark.png;
 hello:bohDark.png;
-naoBig:BigNAO.png;
+naoBig:BigNAODark.png;

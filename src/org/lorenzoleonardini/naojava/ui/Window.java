@@ -37,8 +37,6 @@ public class Window extends JFrame
 	public NAO nao;
 	public Robots robots;
 	
-	public boolean connecting = true;
-
 	public Window()
 	{
 		setTitle("NAO-Java");
@@ -89,12 +87,15 @@ public class Window extends JFrame
 
 		update(false);
 		
+		menu.homePanelLoading(true);
 		robots = new Robots(this);
 		new Thread(() -> {
 			if (robots.robotCount() > 0)
-				nao = robots.connect();
-			connecting = false;
+				setNAO(robots.connect());
+			menu.homePanelLoading(false);
 		}).start();
+		
+		
 
 		setVisible(true);
 	}
@@ -137,6 +138,8 @@ public class Window extends JFrame
 		lang = langs.selected;
 		bar.updateLanguage();
 		menu.updateLanguage();
+		if (robots != null)
+			robots.updateLanguage();
 		updateUI();
 	}
 
@@ -149,5 +152,11 @@ public class Window extends JFrame
 		if (robots != null)
 			robots.updateTheme();
 		updateUI();
+	}
+	
+	public void setNAO(NAO nao)
+	{
+		this.nao = nao;
+		selected.select();
 	}
 }

@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 
 import org.lorenzoleonardini.naojava.NAO;
 import org.lorenzoleonardini.naojava.NAOConnectionException;
+import org.lorenzoleonardini.naojava.resources.Resources;
 
 public class SavedNAO extends JPanel
 {
@@ -22,6 +23,7 @@ public class SavedNAO extends JPanel
 	
 	private JLabel nameLabel;
 	private JLabel naoImage;
+	private JLabel naoColor;
 	private JLabel naoIp;
 	private JLabel disconnect;
 	
@@ -45,6 +47,7 @@ public class SavedNAO extends JPanel
 		this.name = nao.getName();
 		this.ip = nao.getIP();
 		init();
+		naoColor.setIcon(Resources.getIcon(nao.getColor() + "NAO.png"));
 		connected = true;
 	}
 	
@@ -66,7 +69,11 @@ public class SavedNAO extends JPanel
 		naoImage.setBounds(0, 140, 750, 265);
 		add(naoImage);
 		
-		naoIp = new JLabel("Connected at: " + ip);
+		naoColor = new JLabel(Resources.getIcon("blueNAO.png"));
+		naoColor.setBounds(0, 140, 750, 265);
+		add(naoColor);
+		
+		naoIp = new JLabel(window.lang.getString("connectedAt") + ": " + ip);
 		naoIp.setBounds(0, 415, 750, 40);
 		naoIp.setForeground(window.theme.getColor("foregroundText"));
 		naoIp.setFont(Const.FONT_20);
@@ -74,7 +81,7 @@ public class SavedNAO extends JPanel
 		naoIp.setHorizontalAlignment(JLabel.CENTER);
 		add(naoIp);
 		
-		disconnect = new JLabel("DISCONNECT");
+		disconnect = new JLabel(window.lang.getString("disconnect"));
 		disconnect.setOpaque(true);
 		disconnect.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		disconnect.setForeground(window.theme.getColor("foregroundHover"));
@@ -91,7 +98,7 @@ public class SavedNAO extends JPanel
 				nao = null;
 				connected = false;
 				window.robots.removeRobot(_this);
-				window.nao = null;
+				window.setNAO(null);
 				window.update(false);
 			}
 		});
@@ -105,6 +112,7 @@ public class SavedNAO extends JPanel
 			return null;
 		connected = true;
 		nameLabel.setText(nao.getName().toUpperCase());
+		naoColor.setIcon(Resources.getIcon(nao.getColor() + "NAO.png"));
 		window.update(true);
 		return nao;
 	}
@@ -117,6 +125,17 @@ public class SavedNAO extends JPanel
 	public void updateTheme()
 	{
 		nameLabel.setForeground(window.theme.getColor("foregroundSelected"));
+		naoImage.setIcon(window.theme.getIcon("naoBig"));
+		naoIp.setForeground(window.theme.getColor("foregroundText"));
+		disconnect.setForeground(window.theme.getColor("foregroundHover"));
+		disconnect.setBackground(window.theme.getColor("pickerBG"));
+		disconnect.setBorder(window.theme.getBorder("pickerBorder"));
+	}
+	
+	public void updateLanguage()
+	{
+		naoIp.setText(window.lang.getString("connectedAt") + ": " + ip);
+		disconnect.setText(window.lang.getString("disconnect"));
 	}
 	
 	public boolean isConnected()

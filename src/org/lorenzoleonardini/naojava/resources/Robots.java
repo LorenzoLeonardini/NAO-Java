@@ -220,6 +220,12 @@ public class Robots
 		}
 	}
 	
+	public void updateLanguage()
+	{
+		for(SavedNAO nao : NAOs)
+			nao.updateLanguage();
+	}
+	
 	public List<SavedNAO> getNAOS()
 	{
 		return NAOs;
