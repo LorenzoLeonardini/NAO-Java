@@ -24,7 +24,7 @@ import org.lorenzoleonardini.naojava.ui.panels.LoadingPanel;
 
 public class Window extends JFrame
 {
-	private static final String VERSION = "0.1";
+	private static final String VERSION = "v0.1";
 	
 	private static final long serialVersionUID = 1L;
 
