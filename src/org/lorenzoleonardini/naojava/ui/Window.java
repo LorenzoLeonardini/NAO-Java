@@ -9,4 +9,8 @@ public class Window
 	public Themes theme;
 	
 	public NAO nao;
+	
+	public void updateUI()
+	{
+	}
 }

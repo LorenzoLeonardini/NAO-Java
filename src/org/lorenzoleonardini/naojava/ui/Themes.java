@@ -21,4 +21,9 @@ public class Themes
 	{
 		return null;
 	}
+	
+	public String getTheme()
+	{
+		return null;
+	}
 }
