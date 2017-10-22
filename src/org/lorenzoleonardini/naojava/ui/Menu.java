@@ -51,9 +51,12 @@ public class Menu extends JPanel
 		
 		for(ExtensionInstance e : window.extManager.getExtensions())
 		{
+			e.updateLanguage(window.lang.toString());
 			PagePanel panel = e.initPanel(window);
 			extPanels.add(panel);
-			extElmnts.add(newMenuElement(e.info.menuString(), panel));
+			MenuElement elmnt = newMenuElement(e.info.menuString(), panel);
+			e.setMenuElement(elmnt);
+			extElmnts.add(elmnt);
 		}
 		
 		settingsPanel = new SettingsPanel(window);
@@ -77,8 +80,8 @@ public class Menu extends JPanel
 		leds.setText(window.lang.getString("leds"));
 		settings.setText(window.lang.getString("settings"));
 		
-		for(MenuElement el : extElmnts)
-			el.updateLang(window.lang.toString());
+		for(ExtensionInstance e : window.extManager.getExtensions())
+			e.updateLanguage(window.lang.toString());
 		
 		homePanel.superUpdateLanguage();
 		posturesPanel.superUpdateLanguage();

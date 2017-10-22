@@ -3,8 +3,12 @@ package org.lorenzoleonardini.naojava.ui;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.lorenzoleonardini.naojava.extensions.ExtensionLanguage;
+
 public abstract class PagePanel extends JPanel
 {
+	public ExtensionLanguage STRINGS = new ExtensionLanguage();
+	
 	private static final long serialVersionUID = 1L;
 
 	protected Window window;

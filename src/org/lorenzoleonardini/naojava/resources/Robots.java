@@ -187,6 +187,12 @@ public class Robots
 	{
 		NAOs.remove(nao);
 		
+		for(SavedNAO n : NAOs)
+		{
+			if(n.getIP().equalsIgnoreCase(nao.getIP()))
+				System.out.println("AHAHAHAHAH E INVECE NON LO CANCELLO");
+		}
+		
 		try
 		{
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));

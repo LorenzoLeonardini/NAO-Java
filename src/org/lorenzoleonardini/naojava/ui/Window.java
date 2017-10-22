@@ -1,12 +1,18 @@
 package org.lorenzoleonardini.naojava.ui;
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.json.JSONObject;
 import org.lorenzoleonardini.naojava.NAO;
 import org.lorenzoleonardini.naojava.extensions.ExtensionsManager;
 import org.lorenzoleonardini.naojava.resources.Language;
@@ -18,6 +24,8 @@ import org.lorenzoleonardini.naojava.ui.panels.LoadingPanel;
 
 public class Window extends JFrame
 {
+	private static final String VERSION = "0.1";
+	
 	private static final long serialVersionUID = 1L;
 
 	protected JPanel panel = new JPanel();
@@ -36,7 +44,7 @@ public class Window extends JFrame
 
 	public NAO nao;
 	public Robots robots;
-	
+
 	public Window()
 	{
 		setTitle("NAO-Java");
@@ -67,6 +75,18 @@ public class Window extends JFrame
 		langs = new Languages(settings);
 		lang = langs.selected;
 		theme = new Themes(this, settings);
+		
+		
+		try
+		{
+			checkForUpdate();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		
 		extManager = new ExtensionsManager();
 
 		pagePanel = new LoadingPanel(this);
@@ -86,7 +106,7 @@ public class Window extends JFrame
 		System.out.println("\n");
 
 		update(false);
-		
+
 		menu.homePanelLoading(true);
 		robots = new Robots(this);
 		new Thread(() -> {
@@ -94,10 +114,23 @@ public class Window extends JFrame
 				setNAO(robots.connect());
 			menu.homePanelLoading(false);
 		}).start();
-		
-		
 
 		setVisible(true);
+	}
+	
+	private void checkForUpdate() throws IOException
+	{
+		URL url = new URL("https://api.github.com/repos/LorenzoLeonardini/NAO-Java/releases/latest");
+		URLConnection conn = url.openConnection();
+		BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+		JSONObject json = new JSONObject(br.readLine());
+		if(!VERSION.equals(json.getString("tag_name")))
+		{
+			new UpdateWindow(this, json.getString("name"), json.getString("published_at").split("T")[0]);
+		}
+
+		br.close();
 	}
 
 	protected void select(MenuElement e)
@@ -113,7 +146,7 @@ public class Window extends JFrame
 		panel.add(pagePanel);
 	}
 
-	protected void updateUI()
+	public void updateUI()
 	{
 		if (bar != null)
 			bar.updateUI();
@@ -153,7 +186,7 @@ public class Window extends JFrame
 			robots.updateTheme();
 		updateUI();
 	}
-	
+
 	public void setNAO(NAO nao)
 	{
 		this.nao = nao;

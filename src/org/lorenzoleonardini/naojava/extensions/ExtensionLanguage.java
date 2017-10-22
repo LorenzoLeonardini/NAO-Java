@@ -3,52 +3,34 @@ package org.lorenzoleonardini.naojava.extensions;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.lorenzoleonardini.naojava.ui.PagePanel;
-
 public class ExtensionLanguage
 {
-	private static Map<PagePanel, Map<String, Map<String, String>>> strings = new HashMap<PagePanel, Map<String, Map<String, String>>>();
-
-	private static String lang = "en";
-
-	public static void add(PagePanel panel, String lang, String key, String message)
+	private Map<String, String> strings = new HashMap<String, String>();
+	private String lang = "en"; 
+	
+	public ExtensionLanguage()
 	{
-		key = key.toLowerCase();
-		lang = lang.toLowerCase().substring(0, 2);
 		
-		if (strings.get(panel) == null)
-			strings.put(panel, new HashMap<String, Map<String, String>>());
-
-		if (strings.get(panel).get(key) == null)
-			strings.get(panel).put(key, new HashMap<String, String>());
-
-		strings.get(panel).get(key).put(lang, message);
+	}
+	
+	public void setStrings(Map<String, String> strings)
+	{
+		this.strings = strings;
 	}
 
-	public static String getText(PagePanel panel, String key)
+	public String get(String key)
 	{
-		key = key.toLowerCase();
+		if(lang.equalsIgnoreCase("en"))
+			return strings.get(key.toLowerCase());
 		
-		if (strings.get(panel) == null)
-			return "NO PANEL";
-
-		if (strings.get(panel).get(key) == null)
-			return "NO KEY";
-
-		if (strings.get(panel).get(key).get(lang) == null)
-			if (strings.get(panel).get(key).get("en") == null)
-				if (strings.get(panel).get(key).get(strings.get(panel).get(key).keySet().iterator().next()) == null)
-					return "NO STRING AT ALL";
-				else
-					return strings.get(panel).get(key).get(strings.get(panel).get(key).keySet().iterator().next());
-			else
-				return strings.get(panel).get(key).get("en");
+		if(strings.containsKey(key.toLowerCase() + "_" + lang.toLowerCase()))
+			return strings.get(key.toLowerCase() + "_" + lang.toLowerCase());
 		else
-			return strings.get(panel).get(key).get(lang);
+			return strings.get(key.toLowerCase());
 	}
 
-	public static void setLang(String lang)
+	public void setLang(String lang)
 	{
-		ExtensionLanguage.lang = lang;
+		this.lang = lang;
 	}
 }

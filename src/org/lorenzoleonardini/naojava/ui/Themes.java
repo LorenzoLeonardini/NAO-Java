@@ -59,4 +59,9 @@ public class Themes
 	{
 		return (name.equals("dark") ? dark : white).getIcon(id);
 	}
+	
+	public String getTheme()
+	{
+		return name;
+	}
 }

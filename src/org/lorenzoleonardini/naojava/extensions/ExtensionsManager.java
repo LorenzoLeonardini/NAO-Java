@@ -18,6 +18,8 @@ public class ExtensionsManager
 		System.out.println("Loading extensions...");
 		for (File file : folder.listFiles())
 		{
+			if(!file.getName().endsWith(".jar"))
+				continue;
 			try
 			{
 				ExtensionInstance e = new ExtensionInstance(file);

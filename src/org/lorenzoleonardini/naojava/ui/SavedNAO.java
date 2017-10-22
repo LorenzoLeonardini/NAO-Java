@@ -43,6 +43,7 @@ public class SavedNAO extends JPanel
 	{
 		if(nao == null)
 			throw new NAOConnectionException(window.lang.getString("notConnected"));
+		this.nao = nao;
 		this.window = window;
 		this.name = nao.getName();
 		this.ip = nao.getIP();
@@ -95,6 +96,8 @@ public class SavedNAO extends JPanel
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
+				if(connected)
+					nao.disconnect();
 				nao = null;
 				connected = false;
 				window.robots.removeRobot(_this);
